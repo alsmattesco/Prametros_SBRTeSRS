@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using VMS.TPS.Common.Model.API;
+using VMS.TPS.Common.Model.Types;
 
 namespace Prametros_SBRTeSRS.ViewModel
 {
@@ -17,7 +18,7 @@ namespace Prametros_SBRTeSRS.ViewModel
         public ScriptContext context;
         public ShellViewModel(Patient p)
         {
-            CoursesList = GetListOfCourse(p);           
+            CoursesList = GetListOfCourse(p);
             MeuComando = new RelayCommand(AllFuncs);
         }
 
@@ -38,21 +39,11 @@ namespace Prametros_SBRTeSRS.ViewModel
         private string _volumeD100;
         private string _volumeD50;
         private string _doseMax;
-
         private string _doseMax2CM;
+        private double _minValueX;
+        private double _minValueY;
 
-        
-
-
-
-
-
-
-
-
-
-
-
+        private string _dosePTVV100;
 
         public List<PlanSetup> PlaningList
         {
@@ -72,14 +63,14 @@ namespace Prametros_SBRTeSRS.ViewModel
         public PlanSetup SelectedPlan
         {
             get { return _selectedPlan; }
-            set 
-            { 
+            set
+            {
                 _selectedPlan = value;
                 GetListOfStructures(SelectedPlan);
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
-        
+
         public ICommand MeuComando
         {
             get { return _meuComando; }
@@ -113,7 +104,7 @@ namespace Prametros_SBRTeSRS.ViewModel
         public Structure SelectedPTV
         {
             get { return _selectedPTV; }
-            set 
+            set
             { _selectedPTV = value; OnPropertyChanged(); }
         }
         public Structure SelectedD100
@@ -135,8 +126,8 @@ namespace Prametros_SBRTeSRS.ViewModel
         public int NumberOfFraction
         {
             get { return _numberOfFraction; }
-            set 
-            { 
+            set
+            {
                 _numberOfFraction = value;
                 OnPropertyChanged();
             }
@@ -180,6 +171,21 @@ namespace Prametros_SBRTeSRS.ViewModel
             get { return _doseMax2CM; }
             set { _doseMax2CM = value; OnPropertyChanged(); }
         }
+        public double MinValueX
+        {
+            get { return _minValueX; }
+            set { _minValueX = value; OnPropertyChanged(); }
+        }
+        public double MinValueY
+        {
+            get { return _minValueY; }
+            set { _minValueY = value; OnPropertyChanged(); }
+        }
+        public string DosePTVV100
+        {
+            get { return _dosePTVV100; }
+            set { _dosePTVV100 = value; OnPropertyChanged(); }
+        }
         public void GetListOfStructures(PlanSetup plan)
         {
             if (SelectedPlan != null)
@@ -187,7 +193,7 @@ namespace Prametros_SBRTeSRS.ViewModel
                 try
                 {
                     List<Structure> structures = new List<Structure>();
-                    foreach(Structure structure in plan.StructureSet.Structures)
+                    foreach (Structure structure in plan.StructureSet.Structures)
                     {
                         if (structure.IsEmpty)
                         {
@@ -197,11 +203,11 @@ namespace Prametros_SBRTeSRS.ViewModel
                         {
                             structures.Add(structure);
                         }
-                                              
+
                     }
                     StructureList = structures;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     MessageBox.Show("Erro ao obter a lista de estruturas: ");
                 }
@@ -250,7 +256,7 @@ namespace Prametros_SBRTeSRS.ViewModel
             List<Beam> listOfBeams = new List<Beam>();
             foreach (Beam b in SelectedPlan.Beams)
             {
-                if(b.IsSetupField == false)
+                if (b.IsSetupField == false)
                 {
                     listOfBeams.Add(b);
                 }
@@ -273,12 +279,64 @@ namespace Prametros_SBRTeSRS.ViewModel
 
         public void GetDoseMax()
         {
-            DoseMax = SelectedPlan.Dose.DoseMax3D.Dose.ToString("F2");
+            double DoseMaxRelative;
+            double NormalizationType;
+            DoseMaxRelative = SelectedPlan.Dose.DoseMax3D.Dose;
+            NormalizationType = SelectedPlan.PrescribedPercentage;
+            DoseMax = (DoseMaxRelative / NormalizationType).ToString("F1");
         }
 
         public void GetDoseMax2CM()
         {
-            DoseMax2CM = (SelectedPlan.GetDoseAtVolume(Selected2CM, 0.0, 0, 0)).ToString();
+            var DoseMax2CMRelative = SelectedPlan.GetDoseAtVolume(Selected2CM, 0.0, 0, 0);
+            double NormalizationType = SelectedPlan.PrescribedPercentage;
+            DoseMax2CM = (DoseMax2CMRelative / NormalizationType).ToString();
+        }
+
+        public void GetMinX()
+        {
+            List<Beam> listOfBeams = new List<Beam>();
+            List<double> listOfJawsX = new List<double>();
+            foreach (Beam b in SelectedPlan.Beams)
+            {
+                if (b.IsSetupField == false)
+                {
+                    listOfBeams.Add(b);
+                }
+            }
+            foreach(Beam b in listOfBeams)
+            {
+                listOfJawsX.Add(Math.Abs(b.ControlPoints.FirstOrDefault().JawPositions.X1));
+                listOfJawsX.Add(Math.Abs(b.ControlPoints.FirstOrDefault().JawPositions.X2));
+            }
+            MinValueX = listOfJawsX.Min()/10;
+
+        }
+        public void GetMinY()
+        {
+            List<Beam> listOfBeams = new List<Beam>();
+            List<double> listOfJawsY = new List<double>();
+            foreach (Beam b in SelectedPlan.Beams)
+            {
+                if (b.IsSetupField == false)
+                {
+                    listOfBeams.Add(b);
+                }
+            }
+            foreach (Beam b in listOfBeams)
+            {
+                listOfJawsY.Add(Math.Abs(b.ControlPoints.FirstOrDefault().JawPositions.Y1));
+                listOfJawsY.Add(Math.Abs(b.ControlPoints.FirstOrDefault().JawPositions.Y2));
+            }
+            MinValueY = listOfJawsY.Min() / 10;
+        }
+        public void GetVolumePTVV100()
+        {
+
+            
+            DoseValue.DoseUnit unidade = DoseValue.DoseUnit.cGy;
+            DoseValue PercentOfDoseValue = new DoseValue(TotalDose, unidade);
+            DosePTVV100 = SelectedPlan.GetVolumeAtDose(SelectedPTV, PercentOfDoseValue, 0).ToString("F1");
         }
         private void AllFuncs()
         {
@@ -290,6 +348,9 @@ namespace Prametros_SBRTeSRS.ViewModel
             GetVolumeOfD50();
             GetDoseMax();
             GetDoseMax2CM();
+            GetMinX();
+            GetMinY();
+            GetVolumePTVV100();
 
             MessageBox.Show("Analisado!");
         }
