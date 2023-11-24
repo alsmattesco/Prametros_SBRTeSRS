@@ -10,8 +10,8 @@
     <Grid Background="AliceBlue">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180"></ColumnDefinition>
-            <ColumnDefinition Width="260"></ColumnDefinition>
-            <ColumnDefinition Width="150"></ColumnDefinition>
+            <ColumnDefinition Width="240"></ColumnDefinition>
+            <ColumnDefinition Width="170"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -262,5 +262,49 @@
                 Grid.Column="2" Grid.RowSpan="2"
                 FontSize="20"
                 Command="{Binding MeuComando}"/>
+        
+        <Label Grid.Column="2" Grid.Row="6" Content="Índices do Plano"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom"
+               FontSize="16"/>
+
+        <Label Grid.Column="2" Grid.Row="8" Content="Índice Conformidade"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom"
+               FontSize="16"/>
+
+        <TextBlock
+            Text="{Binding IndiceConformidade}"
+            Grid.Column="2" Grid.Row="9"
+            Height="25" Width="50"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            >
+        </TextBlock>
+
+        <Label Grid.Column="2" Grid.Row="14" Content="Índice de Gradiente"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom"
+               FontSize="16"/>
+
+        <TextBlock
+            Text="{Binding IndiceDeGradiente}"
+            Grid.Column="2" Grid.Row="15"
+            Height="25" Width="50"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            >
+        </TextBlock>
+
+        <Label Grid.Column="2" Grid.Row="11" Content="Índice Paddick"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom"
+               FontSize="16"/>
+
+        <TextBlock
+            Text="{Binding IndicePaddick}"
+            Grid.Column="2" Grid.Row="12"
+            Height="25" Width="50"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            >
+        </TextBlock>
+
     </Grid>
 </UserControl>

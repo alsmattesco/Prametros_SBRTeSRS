@@ -9,7 +9,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Prametros_SBRTeSRS</RootNamespace>
-    <AssemblyName>Prametros_SBRTeSRS.esapi</AssemblyName>
+    <AssemblyName>Parametros_SBRTeSRS_1.1.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

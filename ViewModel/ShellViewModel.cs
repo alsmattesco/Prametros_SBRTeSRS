@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,8 +43,18 @@ namespace Prametros_SBRTeSRS.ViewModel
         private string _doseMax2CM;
         private double _minValueX;
         private double _minValueY;
-
         private string _dosePTVV100;
+        private string _indiceConformidade;
+        private string _indiceDeGradiente;
+        private string _indicePaddick;
+
+        
+
+
+
+
+
+
 
         public List<PlanSetup> PlaningList
         {
@@ -185,6 +196,21 @@ namespace Prametros_SBRTeSRS.ViewModel
         {
             get { return _dosePTVV100; }
             set { _dosePTVV100 = value; OnPropertyChanged(); }
+        }
+        public string IndiceConformidade
+        {
+            get { return _indiceConformidade; }
+            set { _indiceConformidade = value; OnPropertyChanged(); }
+        }
+        public string IndiceDeGradiente
+        {
+            get { return _indiceDeGradiente; }
+            set { _indiceDeGradiente = value; OnPropertyChanged(); }
+        }
+        public string IndicePaddick
+        {
+            get { return _indicePaddick; }
+            set { _indicePaddick = value; OnPropertyChanged(); }
         }
         public void GetListOfStructures(PlanSetup plan)
         {
@@ -331,12 +357,25 @@ namespace Prametros_SBRTeSRS.ViewModel
             MinValueY = listOfJawsY.Min() / 10;
         }
         public void GetVolumePTVV100()
-        {
-
-            
+        {           
             DoseValue.DoseUnit unidade = DoseValue.DoseUnit.cGy;
             DoseValue PercentOfDoseValue = new DoseValue(TotalDose, unidade);
             DosePTVV100 = SelectedPlan.GetVolumeAtDose(SelectedPTV, PercentOfDoseValue, 0).ToString("F1");
+        }
+
+        public void GetConformityIndex()
+        {
+            IndiceConformidade = (SelectedD100.Volume / SelectedPTV.Volume).ToString("F2");           
+        }
+        public void GetGradientIndex()
+        {
+            IndiceDeGradiente = (SelectedD50.Volume / SelectedD100.Volume).ToString("F2");
+        }
+        public void GetPaddickIndex()
+        {
+            DoseValue.DoseUnit unidade = DoseValue.DoseUnit.cGy;
+            DoseValue PercentOfDoseValue = new DoseValue(TotalDose, unidade);
+            IndicePaddick = (Math.Pow((SelectedPlan.GetVolumeAtDose(SelectedPTV, PercentOfDoseValue, 0)/100) * SelectedPTV.Volume, 2) / (SelectedPTV.Volume * SelectedD100.Volume)).ToString("F2");
         }
         private void AllFuncs()
         {
@@ -351,6 +390,9 @@ namespace Prametros_SBRTeSRS.ViewModel
             GetMinX();
             GetMinY();
             GetVolumePTVV100();
+            GetConformityIndex();
+            GetGradientIndex();
+            GetPaddickIndex();
 
             MessageBox.Show("Analisado!");
         }
